@@ -1,3 +1,4 @@
+import pickle
 from typing import Union, List, Tuple, Sequence, Dict, Any, Optional, Collection
 from copy import copy
 from pathlib import Path
@@ -28,6 +29,8 @@ def dataset_factory(data_file: Union[str, Path], *args, **kwargs) -> Dataset:
         return FastaDataset(data_file, *args, **kwargs)
     elif data_file.suffix == '.json':
         return JSONDataset(data_file, *args, **kwargs)
+    elif data_file.suffix == '.pkl':
+        return PickleDataset(data_file)
     elif data_file.is_dir():
         return NPZDataset(data_file, *args, **kwargs)
     else:
@@ -51,6 +54,11 @@ def pad_sequences(sequences: Sequence, constant_value=0, dtype=None) -> np.ndarr
         arr[arrslice] = seq
 
     return array
+
+
+class PickleDataset(Dataset):
+    def __init__(self, data_file: Union[str, Path]):
+        self.data = pickle.load(open(data_file, "rb"))
 
 
 class FastaDataset(Dataset):

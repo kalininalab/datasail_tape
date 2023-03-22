@@ -96,7 +96,7 @@ class WandBVisualizer(TAPEVisualizer):
             logger.warning("WANDB_PROJECT environment variable not found, "
                            "not logging to app.wandb.ai")
             os.environ['WANDB_MODE'] = 'dryrun'
-        wandb.init(dir=log_dir, name=exp_name)
+        wandb.init(dir=log_dir, project="TAPE", name=exp_name)
 
     def log_config(self, config: typing.Dict[str, typing.Any]) -> None:
         wandb.config.update(config)
