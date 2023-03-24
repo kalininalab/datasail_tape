@@ -401,6 +401,7 @@ def run_train(model_type: str,
               save_freq: typing.Union[int, str] = 1,
               model_config_file: typing.Optional[str] = None,
               data_dir: str = './data',
+              tech: str = 'random',
               output_dir: str = './results',
               no_cuda: bool = False,
               seed: int = 42,
@@ -430,8 +431,10 @@ def run_train(model_type: str,
     utils.setup_logging(local_rank, save_path, log_level)
     utils.set_random_seeds(seed, n_gpu)
 
-    train_dataset = utils.setup_dataset(task, data_dir, 'train', tokenizer)
-    valid_dataset = utils.setup_dataset(task, data_dir, 'valid', tokenizer)
+    # data_dir = os.path.join(data_dir, tech)
+
+    train_dataset = utils.setup_dataset(task, data_dir, tech, 'train', tokenizer)
+    valid_dataset = utils.setup_dataset(task, data_dir, tech, 'valid', tokenizer)
     train_loader = utils.setup_loader(
         train_dataset, batch_size, local_rank, n_gpu,
         gradient_accumulation_steps, num_workers)
@@ -542,6 +545,7 @@ def run_train(model_type: str,
 def run_eval(model_type: str,
              task: str,
              from_pretrained: str,
+             tech: str = 'random',
              split: str = 'test',
              batch_size: int = 1024,
              model_config_file: typing.Optional[str] = None,
@@ -570,7 +574,7 @@ def run_eval(model_type: str,
 
     runner = ForwardRunner(model, device, n_gpu)
     runner.initialize_distributed_model()
-    valid_dataset = utils.setup_dataset(task, data_dir, split, tokenizer)
+    valid_dataset = utils.setup_dataset(task, data_dir, tech, split, tokenizer)
     valid_loader = utils.setup_loader(
         valid_dataset, batch_size, local_rank, n_gpu,
         1, num_workers)

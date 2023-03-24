@@ -60,6 +60,13 @@ class PickleDataset(Dataset):
     def __init__(self, data_file: Union[str, Path]):
         self.data = pickle.load(open(data_file, "rb"))
 
+    def __len__(self) -> int:
+        return len(self.data)
+
+    def __getitem__(self, index: int):
+        return self.data[index]
+
+
 
 class FastaDataset(Dataset):
     """Creates a dataset from a fasta file.
@@ -302,6 +309,7 @@ class MaskedLanguageModelingDataset(Dataset):
 
     def __init__(self,
                  data_path: Union[str, Path],
+                 mode: str,
                  split: str,
                  tokenizer: Union[str, TAPETokenizer] = 'iupac',
                  in_memory: bool = False):
@@ -391,6 +399,7 @@ class LanguageModelingDataset(Dataset):
 
     def __init__(self,
                  data_path: Union[str, Path],
+                 mode: str,
                  split: str,
                  tokenizer: Union[str, TAPETokenizer] = 'iupac',
                  in_memory: bool = False):
@@ -437,6 +446,7 @@ class FluorescenceDataset(Dataset):
 
     def __init__(self,
                  data_path: Union[str, Path],
+                 mode: str,
                  split: str,
                  tokenizer: Union[str, TAPETokenizer] = 'iupac',
                  in_memory: bool = False):
@@ -449,7 +459,7 @@ class FluorescenceDataset(Dataset):
         self.tokenizer = tokenizer
 
         data_path = Path(data_path)
-        data_file = f'fluorescence/fluorescence_{split}.lmdb'
+        data_file = f'fluorescence/{split}/fluorescence_{split}.lmdb'
         self.data = dataset_factory(data_path / data_file, in_memory)
 
     def __len__(self) -> int:
@@ -478,6 +488,7 @@ class StabilityDataset(Dataset):
 
     def __init__(self,
                  data_path: Union[str, Path],
+                 mode: str,
                  split: str,
                  tokenizer: Union[str, TAPETokenizer] = 'iupac',
                  in_memory: bool = False):
@@ -490,7 +501,7 @@ class StabilityDataset(Dataset):
         self.tokenizer = tokenizer
 
         data_path = Path(data_path)
-        data_file = f'stability/stability_{split}.lmdb'
+        data_file = f'stability/{mode}/stability_{split}.lmdb'
 
         self.data = dataset_factory(data_path / data_file, in_memory)
 
@@ -520,6 +531,7 @@ class RemoteHomologyDataset(Dataset):
 
     def __init__(self,
                  data_path: Union[str, Path],
+                 mode: str,
                  split: str,
                  tokenizer: Union[str, TAPETokenizer] = 'iupac',
                  in_memory: bool = False):
@@ -534,7 +546,7 @@ class RemoteHomologyDataset(Dataset):
         self.tokenizer = tokenizer
 
         data_path = Path(data_path)
-        data_file = f'remote_homology/remote_homology_{split}.lmdb'
+        data_file = f'remote_homology/{mode}/remote_homology_{split}.lmdb'
         self.data = dataset_factory(data_path / data_file, in_memory)
 
     def __len__(self) -> int:
@@ -562,6 +574,7 @@ class ProteinnetDataset(Dataset):
 
     def __init__(self,
                  data_path: Union[str, Path],
+                 mode: str,
                  split: str,
                  tokenizer: Union[str, TAPETokenizer] = 'iupac',
                  in_memory: bool = False):
@@ -575,7 +588,7 @@ class ProteinnetDataset(Dataset):
         self.tokenizer = tokenizer
 
         data_path = Path(data_path)
-        data_file = f'proteinnet/proteinnet_{split}.lmdb'
+        data_file = f'proteinnet/{mode}/proteinnet_{split}.lmdb'
         self.data = dataset_factory(data_path / data_file, in_memory)
 
     def __len__(self) -> int:
@@ -615,20 +628,22 @@ class SecondaryStructureDataset(Dataset):
 
     def __init__(self,
                  data_path: Union[str, Path],
+                 mode: str,
                  split: str,
                  tokenizer: Union[str, TAPETokenizer] = 'iupac',
                  in_memory: bool = False):
 
-        if split not in ('train', 'valid', 'casp12', 'ts115', 'cb513'):
+        if split not in ('train', 'valid', 'casp12', 'ts115', 'cb513', 'test'):
             raise ValueError(f"Unrecognized split: {split}. Must be one of "
                              f"['train', 'valid', 'casp12', "
-                             f"'ts115', 'cb513']")
+                             f"'ts115', 'cb513', 'test']")
         if isinstance(tokenizer, str):
             tokenizer = TAPETokenizer(vocab=tokenizer)
         self.tokenizer = tokenizer
 
         data_path = Path(data_path)
-        data_file = f'secondary_structure/secondary_structure_{split}.lmdb'
+        # data_file = f'secondary_structure/secondary_structure_{split}.lmdb'
+        data_file = f'secondary_structure/{mode}/sec_str_{split}.pkl'
         self.data = dataset_factory(data_path / data_file, in_memory)
 
     def __len__(self) -> int:
@@ -663,6 +678,7 @@ class TRRosettaDataset(Dataset):
 
     def __init__(self,
                  data_path: Union[str, Path],
+                 mode: str,
                  split: str,
                  tokenizer: Union[str, TAPETokenizer] = 'iupac',
                  in_memory: bool = False,
@@ -677,7 +693,7 @@ class TRRosettaDataset(Dataset):
 
         data_path = Path(data_path)
         data_path = data_path / 'trrosetta'
-        split_files = (data_path / f'{split}_files.txt').read_text().split()
+        split_files = (data_path / f'{mode}/{split}_files.txt').read_text().split()
         self.data = NPZDataset(data_path / 'npz', in_memory, split_files=split_files)
 
         self._dist_bins = np.arange(2, 20.1, 0.5)

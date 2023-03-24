@@ -63,7 +63,9 @@ def create_train_parser(base_parser: argparse.ArgumentParser) -> argparse.Argume
                         help='Batch size')
     parser.add_argument('--data_dir', default='./data', type=utils.check_is_dir,
                         help='Directory from which to load task data')
-    parser.add_argument('--num_train_epochs', default=10, type=int,
+    parser.add_argument('--tech', default='random', type=str,
+                        help='Technique used to split data dataset')
+    parser.add_argument('--num_train_epochs', default=100, type=int,
                         help='Number of training epochs')
     parser.add_argument('--num_log_iter', default=20, type=int,
                         help='Number of training steps per log iteration')
